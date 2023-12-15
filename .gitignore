@@ -3,3 +3,5 @@
 /docker/acme/acme.sh/*
 docker-compose.override.yml
 mysql.env
+docker/php-8/composer/cache/files/*
+docker/php-8/composer/cache/*

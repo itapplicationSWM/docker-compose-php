@@ -23,8 +23,8 @@ services:
     volumes:
       # - ./docker/mariadb/config:/etc/mysql/conf.d:ro
       - ./db/data:/var/lib/mysql
-    #ports:
-    #  - '127.0.0.1:3306:3306'
+    ports:
+      - '3307:3306'
     logging: *default-logging
 
   nginx:
@@ -35,14 +35,15 @@ services:
       - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./docker/nginx/config:/etc/nginx/conf.d:ro
-      - ./projects:/srv/projects
+      - ./projects:/srv/project/
       - ./docker/nginx/acme-challenge:/usr/share/nginx/html:ro
-      # - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
     ports:
       - "80:80"
       # -"443:443"
       - "8025:8025"
       - "8080:8080"
+      - "8000:8000"
     logging: *default-logging
 
   adminer:
@@ -60,5 +61,27 @@ services:
       - ./docker/php-82/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
       - ./docker/php-82/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
       - ./docker/php-82/composer/:/root/.composer/
-      - ./projects/:/srv/projects/
+      - ./projects/:/srv/project/
     logging: *default-logging
+
+  php-8:
+    build: ./docker/php-8/build
+    image: php-8
+    restart: unless-stopped
+    working_dir: /srv/project/
+    env_file:
+      - mysql.env
+    volumes:
+      - ./docker/php-8/config/msmtprc:/etc/msmtprc:ro
+      - ./docker/php-8/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
+      - ./docker/php-8/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - ./docker/php-8/composer/:/root/.composer/
+      - ./projects/:/srv/project/
+    logging: *default-logging
+  #sqldata:
+  #  image: mcr.microsoft.com/mssql/server:2017-latest
+  #  environment:
+  #    - SA_PASSWORD=SWMsecret!
+  #    - ACCEPT_EULA=Y
+  #  ports:
+  #    - "5434:1433"
