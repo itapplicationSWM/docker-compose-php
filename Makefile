@@ -28,6 +28,9 @@ exec:
 	docker-compose exec $(name) /bin/sh || true
 ex: exec
 
+bash:
+	docker-compose exec $(name) bash
+
 # exec shell in first matched php container
 php:
 	docker-compose exec `docker-compose ps --services | grep -m 1 'php-'` /bin/sh -c 'cd /srv/projects; if grep -q "/ash" /etc/shells; then exec /bin/ash; else exec /bin/sh; fi' || true

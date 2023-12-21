@@ -47,8 +47,7 @@ RUN docker-php-ext-enable sqlsrv \
     && docker-php-ext-enable pdo_sqlsrv
 
 
-RUN apk --no-cache add \
-    bash
+RUN apk --no-cache add bash
 
 RUN ARCH=$(uname -m) && \
     case "$ARCH" in \
@@ -72,11 +71,18 @@ RUN ARCH=$(uname -m) && \
 
 
 RUN apk add nano
-RUN apk add openrc --no-cache
+#RUN apk add openrc --no-cache
 RUN apk add --update --no-cache autoconf g++ imagemagick-dev libtool make pcre-dev \
     && pecl install imagick \
     && docker-php-ext-enable imagick \
     && apk del autoconf g++ libtool make pcre-dev \
     && apk add php81-pecl-imagick
 
-RUN apk update && apk add busybox-extras
+#RUN apk update && apk add busybox-extras
+
+RUN echo "* * * * * cd /srv/project/etichette.test && php artisan schedule:run >> /dev/null 2>&1" >> /etc/crontabs/root
+
+RUN apk add busybox-initscripts
+RUN rc-update add crond
+RUN export EDITOR=/usr/bin/nano
+CMD ["crond", "-f"]
