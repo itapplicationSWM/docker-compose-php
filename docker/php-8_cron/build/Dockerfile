@@ -85,4 +85,4 @@ RUN echo "* * * * * cd /srv/project/etichette.test && php artisan schedule:run >
 RUN apk add busybox-initscripts
 RUN rc-update add crond
 RUN export EDITOR=/usr/bin/nano
-#CMD ["crond", "-f"]
+CMD ["crond", "-f"]

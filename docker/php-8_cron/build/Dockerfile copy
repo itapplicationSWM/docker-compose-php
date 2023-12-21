@@ -1,0 +1,46 @@
+FROM php:8.0-fpm-alpine
+RUN apk add --no-cache mysql-client msmtp perl wget procps shadow libzip libpng libjpeg-turbo libwebp freetype icu icu-data-full
+
+RUN apk add --no-cache --virtual build-essentials \
+    icu-dev icu-libs zlib-dev g++ make automake autoconf libzip-dev \
+    libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev && \
+    docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp && \
+    docker-php-ext-install gd && \
+    docker-php-ext-install mysqli && \
+    docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install intl && \
+    docker-php-ext-install opcache && \
+    docker-php-ext-install exif && \
+    docker-php-ext-install zip && \
+    apk del build-essentials && rm -rf /usr/src/php*
+
+RUN wget https://getcomposer.org/composer-stable.phar -O /usr/local/bin/composer && chmod +x /usr/local/bin/composer
+
+RUN usermod -u 1050 www-data && groupmod -g 1050 www-data
+
+#RUN echo $(uname -m)
+#RUN case $(uname -m) in \
+#        x86_64)   architecture="amd64" ;; \
+#        arm64)   architecture="arm64" ;; \
+#        *) architecture="unsupported" ;; \
+#    esac \
+#    if [[ "unsupported" == "$architecture" ]]; \
+#    then \
+#        echo "Alpine architecture $(uname -m) is not currently supported."; \
+#        exit; \
+#    fi
+#
+#RUN curl -O https://download.microsoft.com/download/3/5/5/355d7943-a338-41a7-858d-53b259ea33f5/msodbcsql18_18.3.2.1-1_$architecture.apk
+#RUN curl -O https://download.microsoft.com/download/3/5/5/355d7943-a338-41a7-858d-53b259ea33f5/mssql-tools18_18.3.1.1-1_$architecture.apk
+#
+#RUN curl -O https://download.microsoft.com/download/3/5/5/355d7943-a338-41a7-858d-53b259ea33f5/msodbcsql18_18.3.2.1-1_$architecture.sig
+#RUN curl -O https://download.microsoft.com/download/3/5/5/355d7943-a338-41a7-858d-53b259ea33f5/mssql-tools18_18.3.1.1-1_$architecture.sig
+#
+##RUN apk add gnupg
+##RUN curl https://packages.microsoft.com/keys/microsoft.asc  | gpg --import -
+##RUN gpg --verify msodbcsql18_18.3.2.1-1_$architecture.sig msodbcsql18_18.3.2.1-1_$architecture.apk
+##RUN gpg --verify mssql-tools18_18.3.1.1-1_$architecture.sig mssql-tools18_18.3.1.1-1_$architecture.apk
+#
+#RUN apk add --allow-untrusted msodbcsql18_18.3.2.1-1_$architecture.apk
+#RUN apk add --allow-untrusted mssql-tools18_18.3.1.1-1_$architecture.apk
+

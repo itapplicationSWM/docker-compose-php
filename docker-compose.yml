@@ -79,6 +79,22 @@ services:
       - ./projects/:/srv/project/
     logging: *default-logging
 
+    
+  php-8_cron:
+    build: ./docker/php-8_cron/build
+    image: php-8_cron
+    restart: unless-stopped
+    working_dir: /srv/project/
+    env_file:
+      - mysql.env
+    volumes:
+      - ./docker/php-8_cron/config/msmtprc:/etc/msmtprc:ro
+      - ./docker/php-8_cron/config/php.ini:/usr/local/etc/php/conf.d/my.ini:ro
+      - ./docker/php-8_cron/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - ./docker/php-8_cron/composer/:/root/.composer/
+      - ./projects/:/srv/project/
+    logging: *default-logging
+
 
   #sqldata:
   #  image: mcr.microsoft.com/mssql/server:2017-latest
